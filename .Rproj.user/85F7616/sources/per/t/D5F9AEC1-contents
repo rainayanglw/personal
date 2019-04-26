@@ -1,0 +1,159 @@
+# private function to check vector of probabilities
+check_prob <- function(prob) {
+  if (!is.numeric(prob)) {
+    stop("\n'prob' must be a numeric vector")
+  }
+  if (any(is.na(prob))) {
+    stop("\n'prob' cannot contain missing values")
+  }
+  if (any(prob < 0) | any(prob > 1)) {
+    stop("\n'prob' values must be between 0 and 1")
+  }
+  TRUE
+}
+
+# private function to check vector of trials
+check_trials <- function(trial) {
+  if (!is.numeric(trial) | any(floor(trial) != trial)) {
+    stop("\n'trial' must be an integer vector")
+  }
+  if (any(is.na(trial))) {
+    stop("\n'trial' cannot contain missing values")
+  }
+  if (any(trial < 0)) {
+    stop("\n'trial' values must be positive")
+  }
+  TRUE
+}
+
+# private function to check vector of success
+check_success <- function(suc, trial) {
+  if (!is.numeric(suc) | any(floor(suc) != suc) | any(suc < 0)) {
+    stop("\n'success' must be a non-negative integer vector")
+  }
+  if (any(is.na(suc))) {
+    stop("\n'suc' cannot contain missing values")
+  }
+  if (any(suc > trial)) {
+    stop("\n'success' cannot be greater than trials")
+  }
+  TRUE && check_trials(trial)
+}
+
+
+# private function to calculate mean
+aux_mean <- function(trials, prob) {
+  trials * prob
+}
+
+# private function to calculate variance
+aux_variance <- function(trials, prob) {
+  trials * prob * (1 - prob)
+}
+
+# private function to calculate mode
+aux_mode <- function(trials, prob) {
+  if (is.integer(trials * prob + prob)){
+    c(trials * prob + prob, trials * prob + prob - 1)
+  } else {
+    floor(trials * prob + prob)
+  }
+}
+
+
+# private function to calculate skewness
+aux_skewness <- function(n, p) {
+  (1-2*p) / sqrt(n*p*(1-p))
+}
+
+# private function to calculate kurtosis
+aux_kurtosis <- function(n, p) {
+  (1-6*p*(1-p)) / (n*p*(1-p))
+}
+
+
+
+
+#' @title bin_choose
+#' @description calculate the number of combinations k successes occur in n trials
+#' @param k number of successes
+#' @param n number of trials
+#' @return the number of combinations
+#' @export
+#' @examples
+#' bin_choose(5, 0)
+#'
+#' bin_choose(n = 5, k = 2)
+
+bin_choose <- function(n, k) {
+  check_success(k, n)
+  check_trials(n)
+
+  factorial(n) / (factorial(k) * factorial(n-k))
+}
+
+
+#' @title bin_probability
+#' @description calculate the probability of getting k successes with probability p in n trials
+#' @param k number of successes
+#' @param n number of trials
+#' @param p probability of success
+#' @return the probability of getting k successes with probability p in n trials
+#' @export
+#' @examples
+#' bin_probability(k = 2, n = 5, p = 0.5)
+#'
+#' bin_probability(k = 0:2, n = 5, p = 0.5)
+
+bin_probability <- function(k, n, p) {
+  if (!check_success(k, n)) {
+    stop ('invalid success value')
+  }
+  if (!check_trials(n)) {
+    stop ('invalid trials value')
+  }
+  if (!check_prob(p)) {
+    stop ('invalid probability value')
+  }
+
+  bin_choose(n, k) * p^k * (1-p)^(n-k)
+
+}
+
+
+#' @title bin_distribution
+#' @description calculate the distribution of probabilities of getting different number of successes
+#' @param n number of trials
+#' @param p probability of success
+#' @return a dataframe with two classes of the probability ditribution
+#' @export
+#' @examples
+#' bin_distribution(n = 5, p = 0.5)
+
+library(dplyr)
+bin_distribution <- function(n, p) {
+  if (!check_trials(n)) {
+    stop ('invalid trials value')
+  }
+  if (!check_prob(p)) {
+    stop ('invalid probability value')
+  }
+
+  output = data.frame(success = 0:n)
+
+  output2 = output %>% mutate(probability = bin_probability(output$success, n, p))
+  class(output2) = c("bindis", "data.frame")
+  output2
+
+}
+
+library(ggplot2)
+#' @export
+plot.bindis = function(bindis) {
+  success = bindis$success
+  probability = bindis$probability
+  ggplot(dis1, aes(x = success, y = probability)) +
+    geom_bar(stat = "identity")
+}
+
+

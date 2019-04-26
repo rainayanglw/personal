@@ -1,0 +1,136 @@
+---
+title: "lab12-raina-yang"
+author: "Raina Yang"
+date: "4/26/2019"
+output: html_document
+---
+```{r}
+library(XML)
+library(xml2)
+library(rvest)
+library(magrittr)
+
+# Assemble url (so it fits on screen)
+basket <- "https://www.basketball-reference.com"
+
+nba_html <- paste0(basket, "/leagues/NBA_2017.html")
+
+xml_doc <- read_html(nba_html)
+
+xml_text <- xml_doc %>% html_text()
+
+xml_doc %>%
+  html_nodes("h2") %>%
+  html_text() 
+
+xml_doc %>%
+  html_nodes("h1") %>%
+  html_text() 
+
+xml_doc %>%
+  html_nodes("strong") %>%
+  html_text() 
+
+xml_doc %>%
+  html_nodes("button") %>%
+  html_text() 
+
+
+# node with an attribute
+xml_doc %>%
+  html_nodes("p.listhead") %>%
+  html_text()
+
+
+xml_doc %>%
+  html_nodes(xpath = '//p[@class="listhead"]') %>%
+  html_text()
+
+xml_doc %>%
+  html_nodes(xpath = '//ul[@class=""]//a') %>%
+  html_text()
+
+
+# extracting first table 
+xml_table1 <- xml_doc %>%
+  html_nodes("table") %>%
+  extract(1)
+
+class(xml_table1)
+
+
+tbl1 <- html_table(xml_table1)
+
+head(tbl1)
+
+# extracting second table 
+xml_table2 <- xml_doc %>%
+  html_nodes("table") %>%
+  extract(2)
+
+# two html tables
+xml_tables <- xml_doc %>%
+  html_nodes("table") %>%
+  extract(1:2)
+
+# extract names of teams
+xml_tables %>% 
+  html_nodes("a") %>%
+  html_text()
+
+# href attributes
+hrefs = paste0(xml_tables %>% 
+  html_nodes("a") %>%
+  html_attr("href"))
+
+library(stringr)
+
+teams = str_extract(hrefs, "[A-Z]+")
+teams
+
+files = paste0(teams, "-roster-2017.csv")
+files
+
+
+team <- hrefs[1]
+team_url <- paste0(basket, team)
+team_url
+
+
+
+ # extracting table 
+xml_table1 <-  read_html(team_url)%>%
+  html_nodes("table") 
+
+
+roster <- html_table(xml_table1)
+
+head(roster)
+
+write.csv(roster, "BOS-roster-2017.csv")
+
+#generalization to more teams
+
+for(i in 1:7) {
+  
+  team <- paste0(hrefs[i])
+  team_url <- paste0(basket, team)
+  team_url
+  
+  
+  
+   # extracting table 
+  xml_table1 <-  read_html(team_url)%>%
+    html_nodes("table") 
+  
+  
+  roster <- html_table(xml_table1)
+  
+  head(roster)
+  
+  write.csv(roster, paste0(teams[i], "-roster-2017.csv"))
+  
+}
+
+```
+
