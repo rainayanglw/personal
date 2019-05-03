@@ -1,4 +1,4 @@
 library(testthat)
-library(workout03)
+library(binomial)
 
-test_check("workout03")
+test_check("binomial")
