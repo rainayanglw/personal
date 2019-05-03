@@ -130,32 +130,18 @@ bin_probability <- function(k, n, p) {
 #' @examples
 #' bin_distribution(n = 5, p = 0.5)
 
-library(dplyr)
-bin_distribution <- function(n, p) {
-  if (!check_trials(n)) {
-    stop ('invalid trials value')
-  }
-  if (!check_prob(p)) {
-    stop ('invalid probability value')
-  }
-
-  output = data.frame(success = 0:n)
-
-  output2 = output %>% mutate(probability = bin_probability(output$success, n, p))
-  class(output2) = c("bindis", "data.frame")
-  output2
-
+bin_distribution <- function(n, p){
+  success<-c(0:n)
+  probability<-bin_probability(success, n, p)
+  df<-data.frame(success, probability)
+  class(df)<-c("bindis","data.frame")
+  return(df)
 }
 
-library(ggplot2)
 #' @export
-plot.bindis = function(bindis) {
-  success = bindis$success
-  probability = bindis$probability
-  ggplot(bindis, aes(x = success, y = probability)) +
-    geom_bar(stat = "identity")
+plot.bindis <- function(df,...){
+  barplot(height = df[,2], xlab = "Successes", ylab = "Probability")
 }
-
 
 
 #' @title bin_cumulative
@@ -167,32 +153,22 @@ plot.bindis = function(bindis) {
 #' @examples
 #' bin_cumulative(5, 0.5)
 
-bin_cumulative <- function(n, p) {
-  if (!check_trials(n)) {
-    stop ('invalid trials value')
+bin_cumulative <- function(n, p){
+  success<-c(0:n)
+  probability<-bin_probability(success, n, p)
+  cumulative <- vector("numeric", n)
+  for (i in success){
+    cumulative[i+1] <- sum(bin_probability(c(0:i), n, p) )
   }
-  if (!check_prob(p)) {
-    stop ('invalid probability value')
-  }
-
-  output = bin_distribution(n, p)
-
-  output2 = output %>% mutate(cumulative = cumsum(probability))
-
-
-  class(output2) = c("bincum", "data.frame")
-  output2
-
+  df<-data.frame(success, p, cumulative)
+  class(df)<-c("bincum","data.frame")
+  return(df)
 }
 
 
 #' @export
-plot.bincum = function(bincum) {
-
-  success = bincum$success
-  probability = bincum$cumulative
-
-  ggplot(bincum, aes(x = success, y = cumulative)) + geom_line() + geom_point()
+plot.bincum <- function(df,...){
+  plot(x = df[,1], y = df[,3], type = "o", xlab = "successes", ylab = "probability")
 }
 
 

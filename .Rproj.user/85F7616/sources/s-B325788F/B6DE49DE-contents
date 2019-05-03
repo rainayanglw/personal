@@ -22,10 +22,10 @@ The purpose of this package "workout3" is to create an R package that implements
 
 ## Calculations and Functions
 The following functions are main functions for calculations.
-– bin_choose()
-– bin_probability() 
-– bin_distribution() 
-– bin_cumulative()
+– bin_choose(); 
+– bin_probability(); 
+– bin_distribution(); 
+– bin_cumulative(); 
 
 bin_choose() that calculates the number of
 combinations in which k successes can occur in n trials.
@@ -42,7 +42,6 @@ such as
 # (assuming prob of success = 0.5) 
 bin_probability( 2, 5, 0.5)
 ```
-
 
 bin_distribution() has two arguments trials, and prob.
 
@@ -82,5 +81,32 @@ plot(dis2)
  binsum1 <- summary(bin1)
 binsum1
  
+```
+
+## Measures
+
+`bin_mean()` calculates mean of binomial distributions:
+```{r}
+bin_mean(10,  0.3)
+```
+
+`bin_variance()` calculates variance of binomial distributions:
+```{r}
+bin_variance( 10,  0.3)
+```
+
+`bin_mode()` calculates mode of binomial distributions:
+```{r}
+bin_mode(10, 0.3)
+```
+
+`bin_skewness()` calculates skewness of binomial distributions:
+```{r}
+bin_skewness( 10,  0.3)
+```
+
+`bin_kurtosis()` calculates kurtosis of binomial distributions:
+```{r}
+bin_kurtosis( 10, 0.3)
 ```
 
