@@ -1,7 +1,7 @@
 
 # workout03
 
-binomial is a package that provides functions for binomial distributions.
+Binomial is a package that provides functions for binomial distributions.
 
 bin_choose() calculates the number of combinations in which k successes can occur in n trials.
 
