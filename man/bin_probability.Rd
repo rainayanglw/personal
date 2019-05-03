@@ -20,7 +20,7 @@ the probability of getting k successes with probability p in n trials
 calculate the probability of getting k successes with probability p in n trials
 }
 \examples{
-bin_probability(success = 2, trials = 5, prob = 0.5)
+bin_probability(k = 2, n = 5, p = 0.5)
 
-bin_probability(success = 0:2, trials = 5, prob = 0.5)
+bin_probability(k = 0:2, n = 5, p = 0.5)
 }
